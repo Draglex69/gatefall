@@ -1,0 +1,58 @@
+{
+  "name": "gatefall-desktop",
+  "productName": "Gatefall",
+  "private": true,
+  "version": "1.0.46",
+  "description": "Gatefall, a pixel-art card battler. Desktop build for Windows, macOS, Linux and Steam.",
+  "author": "Gatefall",
+  "main": "main.js",
+  "scripts": {
+    "web": "node ../../scripts/build-app.mjs --platform desktop",
+    "start": "npm run web && electron .",
+    "dist": "npm run web && electron-builder",
+    "dist:win": "npm run web && electron-builder --win",
+    "dist:mac": "npm run web && electron-builder --mac",
+    "dist:linux": "npm run web && electron-builder --linux",
+    "steam": "npm run web && electron-builder --dir --win --linux"
+  },
+  "devDependencies": {
+    "electron": "^45.2.1",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "ch.teastory.gatefall",
+    "productName": "Gatefall",
+    "copyright": "Copyright \u00a9 2026",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "app/**/*"
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "mac": {
+      "target": [
+        "dmg"
+      ],
+      "category": "public.app-category.card-games"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Game"
+    }
+  }
+}

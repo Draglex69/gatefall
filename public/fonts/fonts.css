@@ -1,0 +1,4 @@
+/* Gatefall's two pixel fonts, bundled so the game makes no requests to other sites and works offline.
+   Jersey 10 and Pixelify Sans are licensed under the SIL Open Font License 1.1 (OFL-*.txt in this folder). */
+@font-face{font-family:"Jersey 10";font-style:normal;font-weight:400;font-display:swap;src:url(Jersey10-Regular.woff) format("woff")}
+@font-face{font-family:"Pixelify Sans";font-style:normal;font-weight:400 700;font-display:swap;src:url(PixelifySans-Variable.woff) format("woff")}

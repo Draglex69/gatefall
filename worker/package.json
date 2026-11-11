@@ -1,0 +1,5 @@
+{
+  "name": "gatefall-worker",
+  "private": true,
+  "description": "Cloudflare Worker: Gatefall website + online rooms (deploy with: npx wrangler deploy)"
+}

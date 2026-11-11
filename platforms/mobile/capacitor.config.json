@@ -1,0 +1,21 @@
+{
+  "appId": "ch.teastory.gatefall",
+  "appName": "Gatefall",
+  "webDir": "www",
+  "backgroundColor": "#0c1117",
+  "android": {
+    "allowMixedContent": false,
+    "captureInput": true,
+    "webContentsDebuggingEnabled": false
+  },
+  "ios": {
+    "contentInset": "never",
+    "backgroundColor": "#0c1117"
+  },
+  "plugins": {
+    "SystemBars": {
+      "insetsHandling": "native",
+      "style": "DARK"
+    }
+  }
+}

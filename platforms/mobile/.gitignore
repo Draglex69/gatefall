@@ -1,0 +1,10 @@
+node_modules/
+www/
+# the android/ and ios/ folders made by `npx cap add` ARE meant to be committed,
+# but never commit signing keys or their passwords:
+*.jks
+*.keystore
+keystore.properties
+android/app/release/
+android/
+ios/

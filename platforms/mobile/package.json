@@ -1,0 +1,28 @@
+{
+  "name": "gatefall-mobile",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Android (Google Play) and iOS (App Store) builds of Gatefall, made with Capacitor 8.",
+  "scripts": {
+    "web": "node ../../scripts/build-app.mjs --platform android",
+    "web:ios": "node ../../scripts/build-app.mjs --platform ios",
+    "icons": "capacitor-assets generate --android --ios --iconBackgroundColor #0c1117 --iconBackgroundColorDark #0c1117 --splashBackgroundColor #0c1117 --splashBackgroundColorDark #0c1117",
+    "android": "npm run web && cap sync android && cap open android",
+    "ios": "npm run web:ios && cap sync ios && cap open ios",
+    "run:android": "npm run web && cap run android",
+    "bundle": "npm run web && cap sync android && cd android && ./gradlew bundleRelease"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.0.0",
+    "@capacitor/app": "^8.0.0",
+    "@capacitor/core": "^8.0.0",
+    "@capacitor/ios": "^8.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.0.0"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
