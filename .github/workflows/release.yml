@@ -104,7 +104,7 @@ jobs:
             echo "::warning::APK signed with a throwaway key. Add the ANDROID_KEYSTORE_* secrets (PUBLISHING.md) so updates install over each other."
           fi
           "$BT/zipalign" -f -p 4 android/app/build/outputs/apk/release/app-release-unsigned.apk "$RUNNER_TEMP/aligned.apk"
-          "$BT/apksigner" sign --ks "$RUNNER_TEMP/key.jks" --ks-pass env:KS_PASS --ks-key-alias "$KEY_ALIAS" --key-pass env:KEY_PASS --out ../../out/gatefall-v$V.apk "$RUNNER_TEMP/aligned.apk"
+          "$BT/apksigner" sign --v4-signing-enabled false --ks "$RUNNER_TEMP/key.jks" --ks-pass env:KS_PASS --ks-key-alias "$KEY_ALIAS" --key-pass env:KEY_PASS --out ../../out/gatefall-v$V.apk "$RUNNER_TEMP/aligned.apk"
           if [ -n "$KS_B64" ]; then
             jarsigner -keystore "$RUNNER_TEMP/key.jks" -storepass:env KS_PASS -keypass:env KEY_PASS -signedjar ../../out/gatefall-v$V.aab android/app/build/outputs/bundle/release/app-release.aab "$KEY_ALIAS"
           fi
