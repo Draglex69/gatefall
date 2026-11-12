@@ -29,6 +29,11 @@ jobs:
         run: echo "version=$(grep -oP 'const GAME_VERSION = \K\d+' index.html)" >> "$GITHUB_OUTPUT"
       - name: Build the website
         run: node scripts/build-app.mjs --platform web
+      - name: Web files for any host (GitHub Pages, itch.io, ...)
+        uses: actions/upload-artifact@v4
+        with: { name: web, path: build/web }
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: build/web }
       - name: Rules tests
         run: |
           node tests/gatefall-v47-monster-lp.cjs
@@ -49,6 +54,19 @@ jobs:
           [ -z "$URL" ] && URL="${{ steps.deploy.outputs.deployment-url }}"
           echo "url=${URL%/}" >> "$GITHUB_OUTPUT"
           if [ -n "$URL" ]; then echo "### Play online: $URL" >> "$GITHUB_STEP_SUMMARY"; else echo "### Website not deployed: add the Cloudflare secrets (see PUBLISHING.md)" >> "$GITHUB_STEP_SUMMARY"; fi
+
+  # the web version on GitHub Pages: https://draglex69.github.io/gatefall/
+  # needs Settings -> Pages -> Source: "GitHub Actions" (free for public repositories; private ones need GitHub Pro)
+  pages:
+    needs: web
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    permissions: { pages: write, id-token: write }
+    environment: { name: github-pages, url: "${{ steps.deploy.outputs.page_url }}" }
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4
+      - run: echo "### Play in the browser: ${{ steps.deploy.outputs.page_url }}" >> "$GITHUB_STEP_SUMMARY"
 
   android:
     needs: web
@@ -109,6 +127,10 @@ jobs:
             jarsigner -keystore "$RUNNER_TEMP/key.jks" -storepass:env KS_PASS -keypass:env KEY_PASS -signedjar ../../out/gatefall-v$V.aab android/app/build/outputs/bundle/release/app-release.aab "$KEY_ALIAS"
           fi
           rm -f "$RUNNER_TEMP/key.jks"
+      - name: Web version as a zip (upload it to itch.io or any web host)
+        uses: actions/download-artifact@v4
+        with: { name: web, path: web }
+      - run: cd web && zip -qr ../out/gatefall-v$V-web.zip .
       - uses: actions/upload-artifact@v4
         with:
           name: gatefall-v${{ env.V }}-android
