@@ -1,5 +1,5 @@
 /* Gatefall app shell: local modes work offline; /api/* always stays on the network. */
-const CACHE_NAME = "gatefall-v50-shell-r1";
+const CACHE_NAME = "gatefall-v51-shell-r1";
 // the folder this worker was served from: "/" on the game's own server, "/games/gatefall/" on a static host
 const BASE = new URL("./", self.location.href).pathname;
 const SHELL = [

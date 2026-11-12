@@ -1001,7 +1001,7 @@ body[data-hunt="1"] #oppHero, body[data-hunt="1"] #oppTabs{display:none}
    actions in the same order stay in sync. That is what the phone version's Wi-Fi /
    Bluetooth link will send: one small action object per move. */
 
-const GAME_VERSION = 50;
+const GAME_VERSION = 51;
 /* ---- platform: plain web page, Claude artifact, or an app build ----
    App builds (Android/iOS through Capacitor, Windows/macOS/Linux/Steam through Electron) are made by
    scripts/build-app.mjs, which sets window.GATEFALL_CONFIG: the platform, the server that relays online rooms
@@ -1084,7 +1084,7 @@ const CARDS = {
   tidecaller:{name:"Tidecaller Adept", kind:"monster", level:4, atk:1500, def:1400, attr:"tide", race:"Spellcaster", text:"Apprentices of the harbor school learn to read the tide before they learn to read."},
   vellum:    {name:"Vellum Scribe", kind:"monster", level:3, atk:1200, def:800, attr:"radiant", race:"Spellcaster", flip:"draw1", text:"FLIP: Draw 1 card."},
   rhino:     {name:"Crushhorn Rhino", kind:"monster", level:4, atk:1400, def:1200, attr:"stone", race:"Beast", doubleDmg:true, text:"DOUBLE DAMAGE: when this card attacks on its own, the battle damage it inflicts is doubled: to the monster it hits and to the player (direct attacks and damage that carries over)."},
-  rampart:   {name:"Rampart Ram", kind:"monster", level:4, atk:700, def:2100, attr:"stone", race:"Beast", defAttack:true, text:"This card can attack while in Defense Position, using its DEF (it attacks alone). Against a Defense Position monster, nothing happens. Against an Attack Position monster: if this card's DEF is higher, the difference is dealt to that monster's controller as battle damage; if lower, this card takes the difference, like any monster guarding in Defense Position."},
+  rampart:   {name:"Rampart Ram", kind:"monster", level:4, atk:700, def:2100, attr:"stone", race:"Beast", defAttack:true, text:"This card can attack while in Defense Position, using its DEF (it attacks alone). Against a Defense Position monster, nothing happens. Against an Attack Position monster: if this card's DEF is higher, the difference is dealt to that monster's controller as battle damage; if lower, this card takes the difference, like any monster guarding in Defense Position. A direct attack deals its DEF as battle damage."},
   bastion:   {name:"Bastion Shellguard", kind:"monster", level:4, atk:1000, def:2000, attr:"stone", race:"Rock", text:"Built to hold one doorway for a thousand years. It has held it for nine hundred."},
   mirewisp:  {name:"Mirewisp", kind:"monster", level:2, atk:800, def:600, attr:"gloam", race:"Fiend", flip:"destroyMonster", text:"FLIP: Destroy 1 monster on the field."},
   cinder:    {name:"Cinder Hound", kind:"monster", level:4, atk:1700, def:1000, attr:"ember", race:"Beast", onBattleDestroyed:"burn500", text:"When this card is destroyed by battle: inflict 500 damage to your opponent."},
@@ -1118,9 +1118,9 @@ const CARDS = {
   b_yuki: {name:"Yuki Onna, Winter Empress", kind:"monster", bossForm:true, level:9, atk:3200, def:3000, attr:"tide", race:"Spellcaster", text:"BOSS · 26000 LP. Freezes hunters, negates opposing monster effects and cannot be banished. Capture her to unlock Yuki Onna as a Duelist."},
   // ---- boss abilities: continuous spells in the boss's zones. Destroy one and the boss loses that power (for a while) ----
   ab_regen:     {name:"Regenerating Ooze", kind:"spell", continuous:true, bossAb:true, ab:"regen", n:800, icon:"heal1000", text:"BOSS (always on): the boss regains 800 LP in each of its Standby Phases."},
-  ab_split:     {name:"Mitosis", kind:"spell", continuous:true, bossAb:true, ab:"tokens", token:"slimelet", n:2, cd:2, icon:"revive", text:"BOSS: summon 2 Slimelet tokens (700/700) in Defense Position."},
+  ab_split:     {name:"Mitosis", kind:"spell", continuous:true, bossAb:true, ab:"tokens", tokenId:"slimelet", n:2, cd:2, icon:"revive", text:"BOSS: summon 2 Slimelet tokens (700/700) in Defense Position."},
   ab_glass:     {name:"Rubber Hide", kind:"spell", continuous:true, bossAb:true, ab:"veilSelf", cd:3, icon:"stillwind", text:"BOSS: the boss turns invincible until the end of your next turn: attacks against it deal no damage."},
-  ab_brood:     {name:"Brood Chamber", kind:"spell", continuous:true, bossAb:true, ab:"tokens", token:"drone", n:3, cd:2, icon:"revive", text:"BOSS: summon 3 Drone tokens (1000/600) in Attack Position."},
+  ab_brood:     {name:"Brood Chamber", kind:"spell", continuous:true, bossAb:true, ab:"tokens", tokenId:"drone", n:3, cd:2, icon:"revive", text:"BOSS: summon 3 Drone tokens (1000/600) in Attack Position."},
   ab_jelly:     {name:"Royal Jelly", kind:"spell", continuous:true, bossAb:true, ab:"heal", n:2000, cd:3, icon:"heal1000", text:"BOSS: the boss regains 2000 LP."},
   ab_swarm:     {name:"Swarm Call", kind:"spell", continuous:true, bossAb:true, ab:"swarm", cd:4, icon:"boost700", text:"BOSS: every monster on the boss's side may attack twice this turn. The boss rests during its next turn."},
   ab_cleave:    {name:"Triple Cleave", kind:"spell", continuous:true, bossAb:true, ab:"frenzy", n:3, cd:4, icon:"lance", text:"BOSS: the boss may attack up to 3 times this turn, then it can't attack during its next turn."},
@@ -1146,11 +1146,11 @@ const CARDS = {
   fortune:   {name:"Fortune's Draw", kind:"spell", eff:"draw2", text:"Draw 2 cards."},
   sevens: {name:"Convergence of Seven", kind:"spell", eff:"sevens", text:"Every player draws until they have 7 cards in hand."},
   dawn:      {name:"Second Dawn", kind:"spell", eff:"revive", text:"Special Summon 1 monster from either player's Graveyard to your field in Attack Position."},
-  skyfire:   {name:"Skyfire Judgment", kind:"spell", eff:"judgment", icon:"nukeOpp", dmgType:"thunder", text:"Inflict thunder effect damage equal to your Life Points to every monster your opponent controls (a monster is destroyed if the damage beats its ATK, or its DEF in Defense Position)."},
+  skyfire:   {name:"Skyfire Judgment", kind:"spell", eff:"judgment", icon:"nukeOpp", dmgType:"thunder", text:"Inflict thunder effect damage equal to your Life Points to every monster your opponent controls (on a monster the damage goes straight to its Life Points)."},
   bcall:     {name:"Berserker Call", kind:"spell", eff:"berserkAll", quick:true, bigArt:true, text:"QUICK SPELL: a giant red gorilla screams across the field: every face-up monster on the field goes berserk (it can't drop into Defense Position by itself, rises into Attack Position when its Battle Phase begins, and must charge the nearest monster whenever it can; its owner can't skip the Battle Phase)."},
   redbull:   {name:"Red Bull", kind:"spell", eff:"wings", quick:true, bigArt:true, flavor:"Red Bull gives Wings", text:"QUICK SPELL: 1 face-up monster on the field gains Flight while it stays on the field: it flies over Frontier monsters to attack (unless they fly too), and only flying monsters can block its direct attacks."},
   showoff:   {name:"Show Off", kind:"spell", eff:"showOff", icon:"showoff", text:"Each player may Special Summon 1 monster from their Deck in Attack or Defense Position. Those monsters are petrified (they can't attack or change position) and are sent to the Graveyard in the End Phase. The player(s) whose monster has the highest ATK (Attack Position) or DEF (Defense Position) gain LP equal to the combined ATK/DEF of all the other monsters summoned this way."},
-  fireball:  {name:"Fireball", kind:"spell", eff:"fireball", quick:true, dmg:1500, dmgType:"fire", text:"QUICK SPELL: inflict 1500 fire effect damage to 1 player or 1 monster (a monster is destroyed if the damage beats its ATK, or its DEF in Defense Position). Once per turn, while this card is in your Graveyard: pay 1500 LP to return it to your hand."},
+  fireball:  {name:"Fireball", kind:"spell", eff:"fireball", quick:true, dmg:1500, dmgType:"fire", text:"QUICK SPELL: inflict 1500 fire effect damage to 1 player or 1 monster (on a monster the damage goes straight to its Life Points). Once per turn, while this card is in your Graveyard: pay 1500 LP to return it to your hand."},
   gale:      {name:"Gale Sweep", kind:"spell", eff:"destroyST", quick:true, text:"QUICK SPELL: destroy 1 Spell or Trap on the field."},
   sword:     {icon:"i_sword", name:"Emberforged Blade", kind:"spell", eff:"equip", continuous:true, equipSpell:true, eqGrow:500, text:"EQUIP SPELL: equip to a face-up monster. Once per turn, during your Main Phase: the equipped monster gains 500 ATK, and keeps it until it leaves the field. If the monster leaves the field, this card returns to your hand."},
   shield:    {icon:"i_shield", name:"Bulwark Aegis", kind:"spell", eff:"equip", continuous:true, equipSpell:true, eqDef:1500, eqLp:500, eqShield:true, text:"EQUIP SPELL: equip to a face-up monster. It gains 1500 DEF and 500 Life Points, which can take it above its normal maximum. If it would be destroyed, destroy this card instead. If the monster leaves the field, this card returns to your hand."},
@@ -1368,7 +1368,7 @@ const newZone = (S, c, extra = {}) => ({card:c, pos:"atk", faceDown:false, summo
 // what a monster may attack: a Frontier monster has to be beaten first; fliers go over everything
 // unless the defender has a flier of their own to block them.
 // the attacker's own side: their own field or a partner's. A friendly battle has no direct attack and no Frontier or
-// Duelist obstacle; otherwise it is an ordinary battle (the weaker monster is destroyed and its owner takes the damage).
+// Duelist obstacle; otherwise it is an ordinary battle (the weaker monster takes the gap to its Life Points).
 const friendlySide = (S, ai, dp) => ai === dp || sharedHunter(S, ai, dp);
 function attackOptions(S, ai, slot, dp){
   const az = P(S,ai).m[slot], o = P(S,dp);
@@ -1396,7 +1396,7 @@ function blockOptions(S, bt){
   const az = P(S,bt.ai).m[bt.slot], Dp = P(S,bt.dp); if (!az || !Dp) return [];
   if (CARDS[az.card.id].sneak && !drained(S, az)) return [];   // Shadowpaw Kitten slips past every blocker
   const fly = canFly(S, az);
-  return Dp.m.map((z, k) => ({z, k})).filter(({z, k}) => z && !z.boss && !z.faceDown && z.pos === "def" && !isFrozen(S, z) && CARDS[z.card.id].kind !== "hero" && !CARDS[z.card.id].petrified && (!fly || canFly(S, z)))
+  return Dp.m.map((z, k) => ({z, k})).filter(({z, k}) => z && !z.boss && !z.faceDown && z.pos === "def" && !isFrozen(S, z) && CARDS[z.card.id].kind !== "hero" && !CARDS[z.card.id].petrified && !(z.petrifiedUntil >= S.turn) && (!fly || canFly(S, z)))
     .map(({z, k}) => ({label:`${nm(z.card)} (${curDef(S, z)} DEF)`, value:`m:${bt.dp}:${k}`, card:z.card.id}));
 }
 // the monsters still taking part in an attack (a team attack has several)
@@ -1570,8 +1570,9 @@ function newGame(seed, names = ["You","Bot"], decks = null, extras = null, heroe
     if(tag){S.tag=true;for(let j=0;j<N;j++)P(S,j).team=j<2?0:1;}
     for(let j=0;j<N;j++)if(!P(S,j).isBoss){P(S,j).m=Array(9).fill(null);P(S,j).st=Array(5).fill(null);P(S,j).normalSummoned=false;}
   }
+  if(coop&&hunt)P(S,2).st=Array(7).fill(null);   // the boss row first: setupBoss puts the powers in it
   if (hunt && BOSSES[hunt]) setupBoss(S, coop?2:1, hunt);
-  if(coop&&hunt){P(S,2).st=Array(7).fill(null);for(let j=0;j<N;j++)P(S,j).team=P(S,j).isBoss?1:0;}
+  if(coop&&hunt){for(let j=0;j<N;j++)P(S,j).team=P(S,j).isBoss?1:0;}
   if(S.coop)linkCoopST(S);
   for (let i = 0; i < N; i++) if (!P(S,i).isBoss) draw(S, i, 5, true);
   if(test){
@@ -1673,7 +1674,7 @@ function doBossAct(S, i, k){
   payTax(S, i);
   log(S, `${p.name} unleashes ${d.name}!`, i);
   fxEv(S, {k:"bossAb", owner:i, id:z.card.id, slot:k});
-  return beginLink(S, {player:i, kind:"boss", eff:d.ab, id:z.card.id, uid:z.card.uid, name:d.name, n:d.n, token:d.token}, false);
+  return beginLink(S, {player:i, kind:"boss", eff:d.ab, id:z.card.id, uid:z.card.uid, name:d.name, n:d.n, token:d.tokenId}, false);
 }
 function draw(S, i, n = 1, quiet = false){
   const p = P(S,i), before=p.hand.length;
@@ -1827,7 +1828,7 @@ function wardenSave(S,owner,uid){
 function destroyMonster(S, owner, slot, byBattle = false, foe = null, wardenDecision = null){
   const p = P(S,owner), z = p.m[slot]; if (!z) return;
   if(z.wardenDecision){wardenDecision=z.wardenDecision;delete z.wardenDecision;}
-  const gyDecision=z.gyDecision||null;if(z.gyDecision)delete z.gyDecision;
+  let gyDecision=z.gyDecision||null;if(z.gyDecision)delete z.gyDecision;
   if (isVeiled(S, z)){ log(S, `${nm(z.card)} is invincible: it can't be destroyed.`, owner); fxEv(S, {k:"endure", owner, slot, uid:z.card.uid}); return; }
   if (z.boss){
     const src=S.resolving;
@@ -1836,6 +1837,9 @@ function destroyMonster(S, owner, slot, byBattle = false, foe = null, wardenDeci
     if(bossProt(S,z,"redirect")){const k=p.m.findIndex((x,k)=>x&&k!==slot&&!x.boss);if(k>=0){log(S,`${nm(p.m[k].card)} is destroyed instead of ${nm(z.card)}!`,owner);destroyMonster(S,owner,k,byBattle,foe);return;}}
     knockBoss(S, owner); return;
   }
+  // in the middle of a battle nothing is asked any more: the questions came before it, and no answer means "no"
+  if(S.inBattle){ if(wardenDecision==null)wardenDecision="no"; }
+  if(S.inBattle&&!gyDecision)gyDecision="no";
   if(CARDS[z.card.id].kind==="hero" && heroOf(S,owner)==="warden" && p.lp>1000 && wardenDecision!=="no"){
     if(wardenDecision!=="pay"){
       S.pending={type:"choose",kind:"wardenPay",player:owner,owner,slot,uid:z.card.uid,byBattle,foe,
@@ -1869,7 +1873,8 @@ function destroyMonster(S, owner, slot, byBattle = false, foe = null, wardenDeci
     log(S,`${nm(c)} is banished from the Graveyard instead. ${nm(z.card)} is not destroyed.`,owner);fxEv(S,{k:"endure",owner,slot,uid:z.card.uid});return;
   }
   // Ironheart Warden on the field CAN destroy itself instead (one choice covers a whole sweep); a token is never worth it
-  const wsDecision = z.wsDecision || null; if (z.wsDecision) delete z.wsDecision;
+  let wsDecision = z.wsDecision || null; if (z.wsDecision) delete z.wsDecision;
+  if (S.inBattle && !wsDecision) wsDecision = "no";
   if (!CARDS[z.card.id].token && wardenCanSave(S, owner, z.card.uid)){
     const bid = S.batch || 0;
     if (bid && S.wardenUsed && S.wardenUsed[owner] === bid){ log(S, `Ironheart Warden's sacrifice covers ${nm(z.card)} too.`, owner); return; }
@@ -2604,9 +2609,10 @@ function beginStandby(S){
     const returning=S.exiled.filter(x=>!x.permanent);S.exiled=S.exiled.filter(x=>x.permanent);
     for(const x of returning){
       const p=P(S,x.owner),zk=alive(S,x.owner)?freeM(p,S):-1;   // a player who is out gets nothing back
-      if(zk>=0){p.m[zk]=newZone(S,x.card);fxEv(S,{k:"summon",owner:x.owner,slot:zk,id:x.card.id,uid:x.card.uid});log(S,`${nm(x.card)} returns from banishment.`,x.owner);}else p.gy.push(x.card);
+      if(zk>=0){p.m[zk]=newZone(S,x.card,x.lp!=null?{lp:Math.min(x.lp,monBaseLp(x.card))}:{});fxEv(S,{k:"summon",owner:x.owner,slot:zk,id:x.card.id,uid:x.card.uid});log(S,`${nm(x.card)} returns from banishment.`,x.owner);}else p.gy.push(x.card);
     }
   }
+  if(P(S,S.active).isBoss)bossStandby(S,S.active);   // regeneration and lost powers returning
   for(const j of turnOrderAfter(S,S.active).concat([S.active])){
     const p=P(S,j);
     for(const c of p.hand.filter(c=>D(c).endReturn&&c.returnedFrom!=null)){
@@ -3231,8 +3237,9 @@ function resolveLink(S, link){
         if(banishBlocked(S,z)){log(S,`${link.name} cannot be banished.`,i);return;}
         if (!here){ log(S, `${link.name} is already gone.`, i); return; }
         fxEv(S, {k:"phaseOut", owner:i, slot:link.slot, uid:z.card.uid});
+        const keepLp = monLp(S, z);   // it comes back as hurt as it left: slipping away is no free healing
         p.m[link.slot] = null; leftField(S, z);
-        (S.exiled = S.exiled || []).push({card:z.card, owner:z.stolenFrom ?? i});
+        (S.exiled = S.exiled || []).push({card:z.card, owner:z.stolenFrom ?? i, lp:keepLp});
         log(S, `${link.name} slips away until the next Standby Phase.`, i);
         return;
       }
@@ -3535,31 +3542,51 @@ function battleDestructionTargets(S, bt){
   }
   return atk>curDef(S,dz)?one((atk-curDef(S,dz))*dbl):[];
 }
+// protections that ask a question are asked before the battle, one monster at a time, so no answer gets lost
+// mid-battle: Ironheart Warden paying to stay, Graveseed banishing itself, a Warden on the field taking the hit.
+// Monsters that something automatic saves anyway (invincible, Twinsoul-style endure, Bulwark Aegis) are not asked about.
+const autoSaved=(S,z)=>isVeiled(S,z)||wouldEndure(S,z)||equipsOn(S,z.card.uid).some(e=>e.d.eqShield);
+const battleAskable=(S,o,z)=>{const p=P(S,o),d=CARDS[z.card.id];if(!z||autoSaved(S,z))return false;
+  return (d.kind==="hero"&&heroOf(S,o)==="warden"&&p.lp>1000)||(!d.token&&p.gy.some(c=>CARDS[c.id].gyProtect))||(!d.token&&wardenCanSave(S,o,z.card.uid));};
 function prepareBattleWardens(S,bt,queue){
   const left=[...queue];
   while(left.length){
-    const [owner,slot]=left.shift(),z=P(S,owner).m[slot],p=P(S,owner);if(!z||isVeiled(S,z))continue;
-    const warden=CARDS[z.card.id].kind==="hero"&&heroOf(S,owner)==="warden"&&p.lp>1000;
+    const [owner,slot]=left.shift(),z=P(S,owner).m[slot],p=P(S,owner);if(!z||autoSaved(S,z))continue;
+    const d=CARDS[z.card.id],warden=d.kind==="hero"&&heroOf(S,owner)==="warden"&&p.lp>1000;
     if(warden&&!z.wardenDecision){
       S.pending={type:"choose",kind:"wardenBattle",player:owner,owner,slot,uid:z.card.uid,bt,queue:left,
         prompt:"Ironheart Warden would be destroyed by battle. Pay 1000 LP to keep it on the field?",
         options:[{label:"Pay 1000 LP",value:"b:pay"},{label:"Let it be destroyed",value:"b:no"}]};return;
     }
+    if(z.wardenDecision==="pay")continue;
     const gi=p.gy.findIndex(c=>CARDS[c.id].gyProtect);
-    if(gi>=0&&z.wardenDecision!=="pay"&&!z.gyDecision){
+    if(gi>=0&&!d.token&&!z.gyDecision){
       S.pending={type:"choose",kind:"gyBattle",player:owner,owner,slot,uid:z.card.uid,bt,queue:left,
         prompt:`${nm(z.card)} would be destroyed by battle. Banish ${nm(p.gy[gi])} from the Graveyard instead?`,
         options:[{label:`Banish ${nm(p.gy[gi])}`,value:"b:banish"},{label:"Let destruction continue",value:"b:no"}]};return;
+    }
+    if(z.gyDecision==="yes")continue;
+    // a Warden on the field can only take one hit per battle: once it says yes, the rest are not asked
+    if(!d.token&&!z.wsDecision&&wardenCanSave(S,owner,z.card.uid)&&!(bt.wsYes||[]).includes(owner)){
+      S.pending={type:"choose",kind:"wardenSaveBattle",player:owner,owner,slot,uid:z.card.uid,bt,queue:left,
+        prompt:`${nm(z.card)} would be destroyed by battle. Ironheart Warden can destroy itself instead. Do it?`,
+        options:[{label:"Warden takes the hit",value:"b:yes"},{label:`Let ${nm(z.card)} be destroyed`,value:"b:no"}]};return;
     }
   }
   bt.wardensReady=true;resolveBattle(S,bt);
 }
 function resolveBattle(S, bt){
   if(!bt.wardensReady){
-    const targets=battleDestructionTargets(S,bt),wardens=targets.filter(([o,k])=>{const z=P(S,o).m[k],p=P(S,o);return z&&!isVeiled(S,z)&&((CARDS[z.card.id].kind==="hero"&&heroOf(S,o)==="warden"&&p.lp>1000)||p.gy.some(c=>CARDS[c.id].gyProtect));});
-    if(wardens.length){prepareBattleWardens(S,bt,wardens);return;}
+    const targets=battleDestructionTargets(S,bt),asks=targets.filter(([o,k])=>{const z=P(S,o).m[k];return z&&battleAskable(S,o,z);});
+    if(asks.length){prepareBattleWardens(S,bt,asks);return;}
     bt.wardensReady=true;
   }
+  S.inBattle=true;
+  try{ resolveBattleNow(S,bt); } finally { S.inBattle=false; }
+  // anyone not asked beforehand was decided as "no": clear leftover answers so they don't carry to a later fight
+  for(const q of S.players)for(const z of q.m)if(z){delete z.wardenDecision;delete z.gyDecision;delete z.wsDecision;}
+}
+function resolveBattleNow(S, bt){
   const ai = bt.ai, di = bt.dp ?? firstOpp(S, ai), A = P(S,ai), Dp = P(S,di), noDmg = bt.noDamageFor, target = bt.target;
   if (!alive(S, di) || S.winner != null) return;
   // src is the monster dealing the damage: Mercy Colossus turns it into healing
@@ -3573,12 +3600,14 @@ function resolveBattle(S, bt){
     }
     if (P(S,who).isBoss && n > 0) fxEv(S, {k:"bossHit", owner:who, n});
     dealDamage(S, who, n);
-    if (src && n > 0 && who !== ai && heroBlessing(S, ai, "burglar") && CARDS[src.card.id].kitty && !drained(S, src) && A.burgleTurn !== S.turn && P(S,who).hand.length){
+    if (src && n > 0 && opponents(S, ai).includes(who) && heroBlessing(S, ai, "burglar") && CARDS[src.card.id].kitty && !drained(S, src) && A.burgleTurn !== S.turn && P(S,who).hand.length){
       A.burgleTurn = S.turn; pilfer(S, ai, who, "Velvet Nyx's paws are quick");
     }
   };
   const team = teamOf(S, bt); if (!team.length) return;
   const az = team[0].z, slot = team[0].slot;
+  // a Defense Position attacker that lost its ability before the attack landed (Skill Drain in the chain) can't go on
+  if (!az.faceDown && az.pos === "def" && !(team.length === 1 && defAttacker(S, az))){ log(S, `${nm(az.card)} can no longer attack from Defense Position: the attack stops.`, ai); return; }
   // a lone Defense Position attacker (Rampart Tortoise) fights with its DEF
   const defAtk = team.length === 1 && defAttacker(S, az);
   const atk = defAtk ? curDef(S, az) : team.reduce((s, x) => s + curAtk(S, x.z), 0);
@@ -3586,8 +3615,10 @@ function resolveBattle(S, bt){
   const dbl = team.length === 1 && hasDouble(S, az) ? 2 : 1;
   const twice = n => { if (dbl > 1 && n > 0) log(S, `Double damage! ${nm(az.card)} hits for ${n * dbl}.`, ai); return n * dbl; };
   // Monster Life Points: the loser of a clash takes the gap; whatever goes past its Life Points hits its controller
-  const hitTarget = n => { const rest = battleHitMonster(S, di, target, n, ai); return rest; };
-  const hitTeam = n => { const rest = battleHitTeam(S, team, n, di); if (rest > 0) damage(S, ai, rest, Dp.m[target] || null); };
+  // Mercy Colossus: every bit of battle damage it would inflict, to a monster or a player, heals that player instead
+  const merciful = z => !!z && !!CARDS[z.card.id].heals && !drained(S, z);
+  const hitTarget = n => { if (merciful(az)){ damage(S, di, n, az); return 0; } return battleHitMonster(S, di, target, n, ai); };
+  const hitTeam = n => { const dz0 = Dp.m[target] || null; if (merciful(dz0)){ damage(S, ai, n, dz0); return; } const rest = battleHitTeam(S, team, n, di); if (rest > 0) damage(S, ai, rest, dz0); };
   // a blocked attack: the attack meets the blockers' combined DEF
   const blockers = (bt.blockers || []).map(b => ({slot:b.slot, z:Dp.m[b.slot]})).filter((b, n) => b.z && b.z.card.uid === bt.blockers[n].uid && !b.z.faceDown);
   if (blockers.length){
@@ -3596,7 +3627,8 @@ function resolveBattle(S, bt){
     log(S, `${blockers.map(b => nm(b.z.card)).join(" and ")} ${blockers.length > 1 ? "block together" : "blocks"} (${def} DEF).`, di);
     if (defAtk){ log(S, "Defense meets defense: neither side is harmed."); return; }
     // the blockers share the gap in order; what goes past all of them hits their controller
-    if (atk > def){ const rest = battleHitTeam(S, blockers.map(b => ({owner:di, slot:b.slot, z:b.z})), twice(atk - def), ai); if (rest > 0) damage(S, di, rest, az); }
+    if (atk > def && merciful(az)) damage(S, di, atk - def, az);
+    else if (atk > def){ const rest = battleHitTeam(S, blockers.map(b => ({owner:di, slot:b.slot, z:b.z})), twice(atk - def), ai); if (rest > 0) damage(S, di, rest, az); }
     else if (atk < def) damage(S, ai, def - atk, blockers[0].z);
     else log(S, "The block holds; neither side is harmed.");
     return;
@@ -3623,6 +3655,7 @@ function resolveBattle(S, bt){
     else {
       const datk = curAtk(S, dz);
       if (atk > datk){ log(S, `${nm(az.card)}'s guard throws the attack back.`, ai); damage(S, di, twice(atk - datk), az); }
+      else if (atk < datk && merciful(dz)) damage(S, ai, datk - atk, dz);
       else if (atk < datk){ const rest = battleHitMonster(S, ai, slot, datk - atk, di); if (rest > 0) damage(S, ai, rest, dz); }
       else log(S, "Equal strength: neither monster is harmed.");
     }
@@ -3700,6 +3733,11 @@ function doChoose(S, value){
     }
     case "gyBattle": {
       const z=P(S,pd.owner).m[pd.slot];if(z&&z.card.uid===pd.uid)z.gyDecision=value==="b:banish"?"yes":"no";
+      prepareBattleWardens(S,pd.bt,pd.queue);return null;
+    }
+    case "wardenSaveBattle": {
+      const z=P(S,pd.owner).m[pd.slot];if(z&&z.card.uid===pd.uid)z.wsDecision=value==="b:yes"?"yes":"no";
+      if(value==="b:yes")(pd.bt.wsYes=pd.bt.wsYes||[]).push(pd.owner);
       prepareBattleWardens(S,pd.bt,pd.queue);return null;
     }
     case "wardenSave": {
@@ -4236,7 +4274,10 @@ function botRespond(S, pd){
   if (ev.k === "attack" && ev.dp === me && !(S.after && S.after.negated) && !myLinks){
     const az = P(S,ev.ai).m[ev.slot], a = az ? curAtk(S, az) : 0, dz = ev.target == null ? null : P(S,me).m[ev.target];
     if (has("fader") && ev.target == null && a >= 1000) return has("fader").value;
-    const dmg = ev.target == null ? a : (dz && !dz.faceDown && dz.pos === "atk" ? a - curAtk(S, dz) : 0);
+    // what would actually reach my Life Points: under Monster LP my monster absorbs the gap first
+    const dbl = az && hasDouble(S, az) ? 2 : 1;
+    const gap = !dz ? 0 : Math.max(0, a - (dz.faceDown || dz.pos === "def" ? curDef(S, dz) : curAtk(S, dz))) * dbl;
+    const dmg = ev.target == null ? a * dbl : (!dz || gap <= 0 ? 0 : dz.boss ? gap : Math.max(0, gap - monLp(S, dz)));
     if (has("noDamage") && dmg >= 1500) return has("noDamage").value;
   }
   if (ev.k === "attack" && ev.dp === me && !(S.after && S.after.negated) && !myLinks){
@@ -7055,12 +7096,12 @@ function renderSheet(){
       <p><b>Xyz monsters</b> live in your Extra Deck (up to 15, bottom left). Overlay 2 face-up monsters of the same level to Xyz Summon one; it doesn't use your normal summon. Its materials become overlay units, and once per turn you can detach one to use its effect.</p>
       <p><b>Field spells</b> go in the field zone in the middle of the table and affect every monster on both sides. A new field spell replaces the old one.</p>
       <p><b>Monster Life Points:</b> every monster has its own Life Points (LP, bottom right on its card; stronger monsters have more). Battle and effect damage lower them and a monster at 0 LP is destroyed. Damage stays until it is healed (Healing Spring heals your monsters too), never above the monster's maximum unless an effect raises it (Bulwark Aegis gives 500). Card effects that destroy a monster still destroy it outright. A monster saved from destruction at 0 LP clings on with 1 LP.</p>
-      <p><b>Battle:</b> against Attack Position, the weaker monster takes the difference to its LP; equal strength hurts neither. Against Defense Position, the DEF shields the monster: only the attack beyond the DEF reaches its LP; if the attack is lower, the attacker's player takes the difference. Damage beyond a monster's remaining LP carries over to its controller; otherwise players take battle damage only from direct attacks. Face-down monsters flip up when attacked. <b>Rampart Ram</b> can attack from Defense Position with its DEF: against Defense nothing happens; against Attack, a higher DEF hurts the other player, a lower DEF hurts the Ram. A Duelist on the monster field must be attacked and overcome before its player can be attacked directly, unless the attacker flies. Bosses keep their own rule (see Monster Hunter).</p>
+      <p><b>Battle:</b> against Attack Position, the weaker monster takes the difference to its LP; equal strength hurts neither. Against Defense Position, the DEF shields the monster: only the attack beyond the DEF reaches its LP; if the attack is lower, the attacker's player takes the difference. Damage beyond a monster's remaining LP carries over to its controller; otherwise players take battle damage only from direct attacks. Face-down monsters flip up when attacked. <b>Rampart Ram</b> can attack from Defense Position with its DEF: against Defense nothing happens; against Attack, a higher DEF hurts the other player, a lower DEF hurts the Ram; a direct attack deals its DEF. A Duelist on the monster field must be attacked and overcome before its player can be attacked directly, unless the attacker flies. Bosses keep their own rule (see Monster Hunter).</p>
       <p><b>Traps</b> must be set first and can only spring from your opponent's next turn on.</p>
       <p><b>Free-for-all</b> (3 or 4 players): turns go around the table; everyone else can react to what you do; when you attack, you pick the opponent (tap their tab). Effects that hit "your opponent" either let you choose one or hit all of them. A player at 0 LP is out and their cards leave the table; the last one standing wins.</p>
       <p><b>Direct attacks and blocking:</b> any monster can go straight for the player. The defender may block with face-up Defense Position monsters (pick one or several: their DEF adds up). If the attack beats the total DEF, the blockers share the rest as LP damage in order (beyond all of them, it carries over to their player); if not, the attacker's player takes the difference. A monster that flies can only be blocked by another flier. A Frontier monster still has to be beaten first.</p>
       <p><b>Flight and Double Damage</b> are properties a monster can have from its own card text or be given by an effect (Red Bull gives Flight). <b>Flight:</b> it flies over Frontier monsters and only fliers can block it. <b>Double Damage</b> (×2 on its zone): when it attacks on its own, the battle damage it inflicts is doubled, both to the monster it hits and to the player (direct attacks and damage that carries over). It doesn't apply in team attacks or to damage it takes. Skill Drain stops a card's own properties, not ones given by an effect.</p>
-      <p><b>Attacking:</b> in your Battle Phase, <b>press and hold</b> a monster of yours to select it as the attacker (a short tap opens its card instead). Then tap other ready Attack Position monsters, your partner's included in co-op, to add them to the team: their ATK adds up; if the team loses, its monsters share the damage in order. Tap <b>Attack</b>, then tap the target. The target can be any monster on the table, including one of yours or your partner's; a monster never attacks itself. A battle between allies works like any other: the weaker monster is destroyed and its owner takes the battle damage.</p>
+      <p><b>Attacking:</b> in your Battle Phase, <b>press and hold</b> a monster of yours to select it as the attacker (a short tap opens its card instead). Then tap other ready Attack Position monsters, your partner's included in co-op, to add them to the team: their ATK adds up; if the team loses, its monsters share the damage in order. Tap <b>Attack</b>, then tap the target. The target can be any monster on the table, including one of yours or your partner's; a monster never attacks itself. A battle between allies works like any other: the weaker monster takes the difference to its LP.</p>
       <p><b>Effect damage</b> comes from cards (Fireball, Skyfire Judgment, Ring of Destruction, ...) and can hit a player or a monster. On a monster it ignores ATK and DEF and goes straight to its LP (a boss is driven back only if the damage beats its ATK or DEF). Effect damage and effect destruction carry an attribute (fire, thunder, dark, ...) shown in the log.</p>
       <p><b>Berserk</b> monsters can't change from Attack to Defense Position by themselves, stand up into Attack Position when their side's Battle Phase begins, and have to battle whenever they can: in the Battle Phase they charge one of the nearest monsters on the table at random, allies included, or attack directly if no monster is in reach. A player with a berserk monster can't skip the Battle Phase. Berserk lasts until the monster leaves the field. <b>Berserker Call</b> (Quick Spell) turns every face-up monster on the field berserk.</p>
       <p><b>Frozen</b> monsters can't attack, block, change position or use effects. Yuki Onna's Whiteout lasts only while she is face-up on the field and that Whiteout card remains active. <b>Invincible</b> monsters can't be destroyed and can't change position (an invincible boss takes no damage from attacks). <b>Tokens</b> vanish when they leave the field.</p>
