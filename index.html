@@ -52,7 +52,7 @@
      and what the height allows (4 field rows + the hand = 5 card heights = 7 card widths, plus fixed chrome) */
   --vh:100vh;
   --chrome:calc(calc(216px + var(--topbar, 46px)) + env(safe-area-inset-top, 0px) + env(safe-area-inset-bottom, 0px));
-  --zw:max(24px, min(calc((min(100vw, 600px) - 32px - 6 * var(--gap)) / 7), 92px, calc((var(--vh) - var(--chrome)) / var(--zdiv, 8.75)), var(--zcap, 999px)));
+  --zw:max(24px, min(calc((min(100vw, var(--appmax, 600px)) - 32px - 6 * var(--gap)) / 7), var(--zmax, 92px), calc((var(--vh) - var(--chrome)) / var(--zdiv, 8.75)), var(--zcap, 999px)));
   --pw:calc(var(--zw) * .56);
   --hw:calc(var(--zw) * 1.2);
   --zh:calc(var(--zw) * 1.4);
@@ -66,12 +66,16 @@ html,body{height:100%}
 @supports (height:100dvh){ :root{--vh:100dvh} }
 body[data-ffa="1"]{--chrome:calc(calc(258px + var(--topbar, 46px)) + env(safe-area-inset-top, 0px) + env(safe-area-inset-bottom, 0px))}
 body[data-online="1"]{--chrome:calc(calc(248px + var(--topbar, 46px)) + env(safe-area-inset-top, 0px) + env(safe-area-inset-bottom, 0px))}
-body[data-view="game"]{overflow:hidden; --topbar:0px}
+body[data-view="game"]{overflow:hidden; --topbar:0px; --appmax:980px; --zmax:112px; --zmaxc:84px}
+body[data-view="game"] .app{max-width:var(--appmax)}
+/* co-op and 2v2 on a narrow phone: the field is width-bound, so the hand uses some of the spare height */
+@media (orientation:portrait){ body[data-view="game"][data-coop="1"] .hand{--hw:max(calc(var(--zw) * 1.2), min(14vw, 64px))} }
+body:not([data-view="game"]) .app{padding-top:max(8px, env(safe-area-inset-top, 0px)); padding-bottom:max(8px, env(safe-area-inset-bottom, 0px))}
 /* the sizes are worked out again on <body>, so the per-mode settings above (online bar, hunt strip, no top bar) really apply */
 body{
   margin:0;
   --chrome:calc(216px + var(--topbar, 46px) + env(safe-area-inset-top, 0px) + env(safe-area-inset-bottom, 0px));
-  --zw:max(24px, min(calc((min(100vw, 600px) - 32px - 6 * var(--gap)) / 7), 92px, calc((var(--vh) - var(--chrome)) / var(--zdiv, 8.75)), var(--zcap, 999px)));
+  --zw:max(24px, min(calc((min(100vw, var(--appmax, 600px)) - 32px - 6 * var(--gap)) / 7), var(--zmax, 92px), calc((var(--vh) - var(--chrome)) / var(--zdiv, 8.75)), var(--zcap, 999px)));
   --pw:calc(var(--zw) * .56); --hw:calc(var(--zw) * 1.2); --zh:calc(var(--zw) * 1.4);
 }
 /* in a duel the header buttons leave the top: a rail on the side in landscape, tucked into the log line in portrait */
@@ -109,6 +113,7 @@ body::after{
     radial-gradient(120% 90% at 50% 50%, transparent 55%, rgba(0,0,0,.55) 100%);
 }
 #fx{position:fixed; inset:0; z-index:30; pointer-events:none; overflow:hidden}
+body:has(.scrim) #fx{z-index:15}
 #fx i{position:absolute; display:block}
 .pop-num{position:absolute; font-family:var(--display); font-size:34px; line-height:1; text-shadow:0 3px 0 var(--outline), 0 0 0 var(--outline); -webkit-text-stroke:1px var(--outline); white-space:nowrap}
 .pop-num.bad{color:var(--red)} .pop-num.good{color:var(--green)}
@@ -149,7 +154,7 @@ body[data-view="game"] #bInstall{display:none}
 .coop-name{display:flex;align-items:center;justify-content:center;gap:6px;max-width:100%;line-height:1.15}.coop-name>span{min-width:0;text-align:center}
 .pile-solo{position:relative;width:var(--zw);height:var(--zh)}.pile-solo>.zone.pile{width:100%;height:100%}.partner-pile{position:absolute;top:50%;z-index:8;width:clamp(24px,calc(var(--zw) * .48),34px);aspect-ratio:5/7;padding:0;border:0;background:var(--panel);box-shadow:0 0 0 2px var(--gold);clip-path:var(--notch2);cursor:pointer;transform:translateY(-50%)}.pile-solo.extra>.partner-pile{right:calc(100% + 3px)}.pile-solo.deck>.partner-pile{left:calc(100% + 3px)}.pile-solo.flip.extra>.partner-pile{right:auto;left:calc(100% + 3px)}.pile-solo.flip.deck>.partner-pile{left:auto;right:calc(100% + 3px)}.partner-pile .back{position:absolute;inset:0;width:100%;height:100%}.partner-pile .partner-count{position:absolute;right:-3px;bottom:-3px;min-width:16px;padding:1px 3px 2px;background:var(--outline);color:var(--gold);font:11px var(--display);line-height:1;text-align:center;box-shadow:0 0 0 1px var(--gold)}.partner-pile:active{transform:translateY(calc(-50% + 2px))}.zone.banish{--zbg:rgba(55,24,76,.32);--zline:rgba(190,120,240,.28)}
 .draw-ready{touch-action:none;position:relative;outline:3px solid var(--gold);animation:drawPulse .7s steps(2) infinite;z-index:6}.btn.draw-btn{outline:3px solid var(--gold);animation:drawPulse .7s steps(2) infinite}.draw-ready:active,.draw-ready.draw-pull{transform:translateY(5px) rotate(-3deg)}
-.draw-hint{position:absolute;left:50%;top:-15px;translate:-50% 0;color:var(--gold);font:9px var(--display);white-space:nowrap;text-shadow:2px 2px #000;pointer-events:none}@keyframes drawPulse{50%{filter:brightness(1.45)}}body[data-coop="1"]{--zw:max(22px,min(calc((min(100vw,600px) - 96px - 8 * var(--gap)) / 9),66px,calc((var(--vh) - var(--chrome)) / var(--zdivc, 10.5)),var(--zcap, 999px)));--gap:3px}body[data-coop="1"] #myM{display:grid;grid-template-columns:minmax(0,1fr);gap:3px}body[data-coop="1"] #myST{display:block}body[data-coop="1"] #oppST,body[data-coop="1"] #oppM{grid-template-columns:var(--zw) repeat(7,var(--zw)) var(--zw);gap:var(--gap)}
+.draw-hint{position:absolute;left:50%;top:-15px;translate:-50% 0;color:var(--gold);font:9px var(--display);white-space:nowrap;text-shadow:2px 2px #000;pointer-events:none}@keyframes drawPulse{50%{filter:brightness(1.45)}}body[data-coop="1"]{--zw:max(22px,min(calc((min(100vw,var(--appmax, 600px)) - 38px - 10 * var(--gap)) / 10.12),var(--zmaxc, 66px),calc((var(--vh) - var(--chrome)) / var(--zdivc, 10.5)),var(--zcap, 999px)));--gap:3px}body[data-coop="1"] #myM{display:grid;grid-template-columns:minmax(0,1fr);gap:3px}body[data-coop="1"] #myST{display:block}body[data-coop="1"] #oppST,body[data-coop="1"] #oppM{grid-template-columns:var(--zw) repeat(7,var(--zw)) var(--zw);gap:var(--gap)}
 .row{display:grid; grid-template-columns:var(--zw) repeat(5, var(--zw)) var(--zw); gap:var(--gap); justify-content:center}
 .zone-gap{width:var(--pw)}
 .zone{
@@ -209,13 +214,17 @@ body[data-view="game"] #bInstall{display:none}
 .mc .hp.hurt{background:#3a3112; color:#ffe9a6}.mc .hp.hurt::after{background:linear-gradient(90deg, var(--gold) var(--hp), rgba(0,0,0,.55) 0)}
 .mc .hp.low{background:#401418; color:#ffc0c0}.mc .hp.low::after{background:linear-gradient(90deg, var(--red) var(--hp), rgba(0,0,0,.55) 0)}
 .zone.pile .mc .hp, .revealcard .mc .hp, .opt .thumb .mc .hp{display:none}
-.zone .zhp{position:absolute; right:-3px; bottom:21px; z-index:6; min-width:20px; padding:0 3px 3px; background:#123a22; color:#c9ffd6; font:12px/1 var(--display); text-align:right; font-variant-numeric:tabular-nums; box-shadow:0 0 0 1px var(--outline), 0 2px 0 rgba(0,0,0,.4); pointer-events:none}
+.zone{--bf:clamp(8px, calc(var(--zw) * .21), 12px)}
+.zone .zhp{position:absolute; right:-2px; bottom:calc(var(--bf) + 9px); z-index:6; min-width:calc(var(--bf) * 1.6); padding:0 2px 3px; background:#123a22; color:#c9ffd6; font:12px/1 var(--display); text-align:right; font-variant-numeric:tabular-nums; box-shadow:0 0 0 1px var(--outline), 0 2px 0 rgba(0,0,0,.4); pointer-events:none; font-size:var(--bf)}
 .zone .zhp::after{content:""; position:absolute; left:1px; right:1px; bottom:1px; height:2px; background:linear-gradient(90deg, var(--green) var(--hp, 100%), rgba(0,0,0,.6) 0)}
 .zone .zhp.hurt{background:#3a3112; color:#ffe9a6}.zone .zhp.hurt::after{background:linear-gradient(90deg, var(--gold) var(--hp), rgba(0,0,0,.6) 0)}
 .zone .zhp.low{background:#401418; color:#ffc0c0}.zone .zhp.low::after{background:linear-gradient(90deg, var(--red) var(--hp), rgba(0,0,0,.6) 0)}
 .zone.pile .zhp{display:none}
-.zone .dblb{position:absolute; left:-3px; bottom:21px; z-index:6; padding:0 3px 2px; background:#5a1a12; color:#ffd2a0; font:12px/1 var(--display); box-shadow:0 0 0 1px var(--outline), 0 0 0 2px #f08a3a, 0 2px 0 rgba(0,0,0,.4); pointer-events:none}
-.mc .tag{font-family:var(--display); font-size:12px; line-height:1; letter-spacing:.08em; text-align:center; text-transform:uppercase; padding:1px 0 2px; background:var(--outline)}
+body[data-tiny="1"] .zone .zhp{font-size:0; min-width:0; left:2px; right:2px; height:4px; padding:0; bottom:calc(var(--bf) + 7px); box-shadow:0 0 0 1px var(--outline)}
+body[data-tiny="1"] .zone .zhp::after{left:0; right:0; bottom:0; height:100%}
+body[data-tiny="1"] .zone .dblb{bottom:calc(var(--bf) + 13px); right:1px; padding:0 1px 1px}
+.zone .dblb{position:absolute; right:-2px; bottom:calc(var(--bf) * 2 + 16px); z-index:6; padding:0 2px 2px; background:#5a1a12; color:#ffd2a0; font:var(--bf)/1 var(--display); box-shadow:0 0 0 1px var(--outline), 0 0 0 2px #f08a3a, 0 2px 0 rgba(0,0,0,.4); pointer-events:none}
+.mc .tag{font-family:var(--display); font-size:var(--bf, 12px); line-height:1; letter-spacing:.08em; text-align:center; text-transform:uppercase; padding:1px 0 2px; background:var(--outline)}
 .mc.def{transform:rotate(-90deg) scale(.714)}
 .mc.used{opacity:.6; filter:saturate(.4)}
 .mc.own-set{opacity:.78}
@@ -462,6 +471,7 @@ body[data-coop="1"] .hand, body[data-coop="1"] .lastlog, body[data-coop="1"] .bs
 .sheet h2{margin:0; font-family:var(--display); font-weight:400; font-size:28px; line-height:1; color:var(--gold); text-shadow:var(--ts); text-wrap:balance}
 .sheet p{margin:0; line-height:1.45; max-width:62ch}
 .sheet .acts{display:flex; flex-wrap:wrap; gap:8px}
+.sheet > .acts:last-child{position:sticky; bottom:calc(-18px - env(safe-area-inset-bottom, 0px)); z-index:3; background:var(--panel); margin-bottom:calc(-18px - env(safe-area-inset-bottom, 0px)); padding:8px 0 calc(18px + env(safe-area-inset-bottom, 0px))}
 .sheet .acts .btn{flex:1 1 auto}
 .sheet .hint{font-size:13px; color:var(--muted)}
 .policy{display:flex; flex-direction:column; gap:8px}
@@ -579,8 +589,8 @@ body{height:100%; overflow:hidden; overscroll-behavior:none}
 #menuView.fit5 .save-flop{width:36px; height:36px; padding:5px}
 /* the duel: board and side (buttons + hand) are one column in portrait; side by side on wide, short screens */
 #gameBoard, #gameSide{display:contents}
-@media (orientation:landscape) and (max-height:560px){
-  body[data-view="game"]{--zdiv:7.2; --chrome:calc(150px + env(safe-area-inset-top, 0px) + env(safe-area-inset-bottom, 0px))}
+@media (orientation:landscape) and (max-height:560px), (orientation:landscape) and (min-width:1000px) and (min-aspect-ratio:6/5){
+  body[data-view="game"]{--appmax:calc(100vw - 380px); --zdiv:7.2; --chrome:calc(150px + env(safe-area-inset-top, 0px) + env(safe-area-inset-bottom, 0px))}
   body[data-view="game"][data-hunt="1"]{--zdiv:7.9}
   body[data-view="game"][data-coop="1"]{--zdivc:8.8}
   body[data-view="game"][data-ffa="1"]{--chrome:calc(192px + env(safe-area-inset-top, 0px) + env(safe-area-inset-bottom, 0px))}
@@ -588,7 +598,7 @@ body{height:100%; overflow:hidden; overscroll-behavior:none}
   body[data-view="game"] .app{max-width:none; padding-right:calc(max(12px, env(safe-area-inset-right, 0px)) + 52px)}
   body[data-view="game"] #gameView{flex-direction:row; align-items:center; justify-content:center; gap:16px}
   body[data-view="game"] #gameBoard{display:flex; flex-direction:column; gap:var(--gap); flex:0 1 auto; min-width:0; max-height:100%}
-  body[data-view="game"] #gameSide{display:flex; flex-direction:column; justify-content:center; gap:8px; flex:1 1 220px; min-width:190px; max-width:420px; max-height:100%}
+  body[data-view="game"] #gameSide{display:flex; flex-direction:column; justify-content:center; gap:8px; flex:1 1 220px; min-width:190px; max-width:420px; max-height:100%; margin-left:44px}
   body[data-view="game"] #gameSide .hand{width:100%; --hw:calc(var(--zw) * 1.3)}
   body[data-view="game"] #gameSide .controls{justify-content:center}
 }
@@ -666,6 +676,9 @@ body[data-view="deck"] .app{height:100%; min-height:0; overflow:hidden}
 .drow2 .hp .hpa{width:22px; height:22px; flex:none; overflow:hidden}
 .drow2 .hp .hpa img{width:100%; height:100%; object-fit:cover}
 .drow2 .hp .hpn{font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+/* all Duelists in one row; on a narrow screen only their pictures (the name is in the label and the card sheet) */
+.drow2 .heropick{grid-template-columns:none; grid-auto-flow:column; grid-auto-columns:minmax(0, 1fr)}
+@media (max-width:520px){ .drow2 .hp{justify-content:center} .drow2 .hp .hpn{display:none} .drow2 .hp .hpa{width:28px; height:28px} }
 .drow2 .deckstats{flex:none; gap:4px; font-size:11px; flex-direction:column; align-items:flex-end}
 .drow2 .deckstats .big{font-size:22px; padding:0 6px 2px}
 .dprob{margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
@@ -858,12 +871,13 @@ body[data-view="deck"] .app{height:100%; min-height:0; overflow:hidden}
 .bstage .bbar{flex:1; height:10px; background:#2a0f16; box-shadow:0 0 0 2px var(--outline); position:relative; min-width:40px}
 .bstage .bbar i{position:absolute; inset:0 auto 0 0; background:linear-gradient(180deg, #ff7a6a, #c0283a); transition:width .5s steps(10)}
 .bstage .bnum{font-family:var(--display); font-size:17px; line-height:1; color:#ffb3a7; font-variant-numeric:tabular-nums; text-shadow:var(--ts)}
-.bstage .bwrap{position:absolute; left:0; top:0; width:0; height:0; z-index:6; pointer-events:none; display:flex; justify-content:center; align-items:flex-end}
+.bstage .bwrap{position:absolute; left:0; top:0; width:0; height:0; z-index:2; pointer-events:none; display:flex; justify-content:center; align-items:flex-end}
 .bstage .bwrap.move{transition:left .75s steps(12), top .75s steps(12), width .75s steps(12), height .75s steps(12)}
 .bstage .bwrap.move .boss{animation:mhLeap .75s steps(12)}
 @keyframes mhLeap{0%,100%{translate:0 0}45%{translate:0 -38%}}
 .bstage .bwrap::after{content:""; position:absolute; left:18%; right:18%; bottom:-3%; height:9%; border-radius:50%; background:rgba(0,0,0,.45); z-index:-1}
 .zone.bosszone{box-shadow:inset 0 0 0 2px rgba(239,74,74,.55)}
+.zone:not(.bosszone) > .mc{z-index:3}
 .zone.bosszone.lair::before{content:"☠"; position:absolute; inset:0; display:grid; place-items:center; font-size:calc(var(--zw) * .38); color:rgba(239,74,74,.35)}
 .bstage.sealed .bstat{color:#ffb3a7}
 .boss.sealed{filter:grayscale(.75) brightness(.75) drop-shadow(0 3px 0 rgba(0,0,0,.5)) !important; opacity:.92}
@@ -904,6 +918,11 @@ body[data-hunt="1"] #oppHero, body[data-hunt="1"] #oppTabs{display:none}
 .zone.veiled .standee{filter:drop-shadow(0 0 4px #fff3ad) brightness(1.2)}
 .zone.veiled::after{content:""; position:absolute; inset:-2px; z-index:4; pointer-events:none; box-shadow:0 0 0 2px #f6d660, 0 0 12px 3px rgba(246,214,96,.6); animation:mhguard 1s steps(4) infinite}
 .zone.veiled::before{animation:mhveil 1.2s steps(4) infinite}
+/* attack mode: the chosen attackers and the possible targets are outlined ABOVE the card (the ::before tint sits under it) */
+.zone.sel::after, .zone.target::after, .zone.targeted::after, .zone.spot::after{content:""; position:absolute; inset:-2px; z-index:5; pointer-events:none; box-shadow:inset 0 0 0 3px var(--gold), 0 0 0 1px var(--outline)}
+.zone.target::after, .zone.targeted::after{box-shadow:inset 0 0 0 3px var(--red), 0 0 0 1px var(--outline); animation:blinkTop .5s steps(2) infinite}
+@keyframes blinkTop{0%{box-shadow:inset 0 0 0 3px var(--red), 0 0 0 1px var(--outline)}100%{box-shadow:inset 0 0 0 3px var(--gold), 0 0 0 1px var(--outline)}}
+.zone.sel::after{box-shadow:inset 0 0 0 3px var(--gold), 0 0 10px 2px rgba(242,182,50,.75)}
 .zone.teamable::after{content:""; position:absolute; inset:0; z-index:1; box-shadow:inset 0 0 0 2px #86ccff; pointer-events:none; animation:breathe 1s steps(2) infinite}
 .hunts{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}.hunts .btn{font-size:11px;padding:6px 8px}
 .hlist{display:grid; gap:8px}
@@ -915,11 +934,11 @@ body[data-hunt="1"] #oppHero, body[data-hunt="1"] #oppTabs{display:none}
 #lobbyView.fit1 .panel > .fine, #lobbyView.fit1 .panel > p.fine{display:none}
 #lobbyView.fit2 .panel{padding-block:8px}
 @media (orientation:landscape) and (max-height:560px){ body[data-view="lobby"] .app, body[data-view="hunt"] .app{max-width:min(980px, 100%)} }
-.hgrid{flex:1 1 auto; min-height:0; display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); grid-auto-rows:minmax(0, 1fr); gap:8px}
+.hgrid{flex:1 1 auto; min-height:0; display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); grid-auto-rows:minmax(0, 200px); align-content:start; gap:8px}
 .htile{display:flex; flex-direction:column; align-items:stretch; gap:3px; min-height:0; padding:6px 8px 8px; border:0; background:var(--panel); color:var(--ink); text-align:left; cursor:pointer; font:inherit; clip-path:var(--notch); box-shadow:inset 0 0 0 2px rgba(255,255,255,.06), inset 0 -4px 0 rgba(0,0,0,.25)}
 .htile:hover{background:var(--panel-2)}
 .htile.got{box-shadow:inset 0 0 0 2px rgba(242,182,50,.45), inset 0 -4px 0 rgba(0,0,0,.25)}
-.htile .hart{flex:1 1 auto; min-height:28px; max-height:96px; display:flex; align-items:flex-end; justify-content:center}
+.htile .hart{flex:1 1 auto; min-height:28px; max-height:120px; display:flex; align-items:flex-end; justify-content:center}
 .htile b{font-family:var(--display); font-weight:400; font-size:16px; line-height:1.05; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical}
 .htile .hmeta{display:flex; flex-wrap:wrap; gap:0 6px; font-size:11px; color:var(--muted); line-height:1.3}
 .htile .stars{color:var(--gold); letter-spacing:1px}
@@ -937,14 +956,14 @@ body[data-hunt="1"] #oppHero, body[data-hunt="1"] #oppTabs{display:none}
 .hrow small.ok{color:#8fe39a}
 .b-kong .bl-tower{z-index:0}.b-kong .bl-body,.b-kong .bl-head{z-index:2;transform-origin:50% 70%;animation:kongBeat .7s steps(3) infinite}.b-kong .bl-fists{z-index:3;transform-origin:50% 30%;animation:kongFists .35s steps(2) infinite}.b-kong.chestbeat .bl-body,.b-kong.chestbeat .bl-head{animation-duration:.22s}.b-kong.chestbeat .bl-fists{animation-duration:.12s}.b-yuki .bl-aura{animation:mhspin 8s linear infinite}.b-yuki .bl-robe,.b-yuki .bl-head{animation:yukiFloat 2.2s steps(6) infinite}
 @keyframes kongBeat{50%{transform:scale(1.08,.94) translateY(2px)}}@keyframes kongFists{50%{transform:translateY(-16px) scale(1.15)}}@keyframes yukiFloat{50%{transform:translateY(-4px)}}
-.capture-ov{position:fixed; inset:0; z-index:40; display:grid; place-items:center; padding:16px; box-sizing:border-box; overflow:hidden;
+.capture-ov{position:fixed; inset:0; z-index:40; display:flex; padding:16px; box-sizing:border-box; overflow:hidden auto; overscroll-behavior:contain;
   background:radial-gradient(ellipse at 50% 40%, rgba(90,60,10,.9), rgba(10,8,14,.96) 70%); animation:dfIn .6s steps(6) both}
-.capture-ov .rays{position:absolute; left:50%; top:38%; width:160vmax; height:160vmax; translate:-50% -50%; background:repeating-conic-gradient(rgba(242,182,50,.16) 0 10deg, transparent 10deg 20deg); animation:mhspin 14s linear infinite; pointer-events:none}
+.capture-ov .rays{position:fixed; left:50%; top:38%; width:160vmax; height:160vmax; translate:-50% -50%; background:repeating-conic-gradient(rgba(242,182,50,.16) 0 10deg, transparent 10deg 20deg); animation:mhspin 14s linear infinite; pointer-events:none}
 @keyframes mhspin{to{rotate:360deg}}
-.capture-ov .cbox{position:relative; z-index:1; width:min(380px, 100%); display:flex; flex-direction:column; align-items:center; gap:10px; text-align:center}
+.capture-ov .cbox{position:relative; z-index:1; margin:auto; width:min(380px, 100%); display:flex; flex-direction:column; align-items:center; gap:10px; text-align:center}
 .capture-ov .ctitle{margin:0; font-family:var(--display); font-weight:400; font-size:min(15vw, 66px); line-height:.95; color:var(--gold); text-shadow:0 4px 0 #7a5208, 0 8px 0 rgba(0,0,0,.6); white-space:nowrap}
 .capture-ov .ctitle span{display:inline-block; animation:dfDrop .6s steps(8) both; animation-delay:calc(.2s + var(--i) * .07s)}
-.capture-ov .ccard{width:min(200px, 56vw); animation:cFlip 1.2s steps(14) .6s both}
+.capture-ov .ccard{width:min(200px, 56vw, 30vh); animation:cFlip 1.2s steps(14) .6s both}
 @keyframes cFlip{0%{transform:perspective(600px) rotateY(90deg) scale(.4); opacity:0}50%{transform:perspective(600px) rotateY(-20deg) scale(1.1); opacity:1}100%{transform:none; opacity:1}}
 .capture-ov p{margin:0; color:var(--ink); font-size:14px; animation:dfIn .5s steps(5) 1.4s both}
 .capture-ov .acts{justify-content:center; flex-wrap:wrap; animation:dfIn .5s steps(5) 1.6s both}
@@ -6220,6 +6239,9 @@ function fitScreen(reset){
       if (next >= zw) break;
       st.setProperty("--zcap", next + "px");
     }
+    // very small cards show their Life Points as a bar only
+    const z = document.querySelector("#myM .zone, #oppM .zone"), tiny = !!z && z.offsetWidth > 0 && z.offsetWidth < 38;
+    if ((document.body.dataset.tiny === "1") !== tiny) document.body.dataset.tiny = tiny ? "1" : "";
   }
 }
 if (typeof addEventListener === "function") addEventListener("resize", () => scheduleFit(true));
@@ -6630,7 +6652,7 @@ function bigCard(id){
   if (d.kind === "monster"){
     lv = `<span style="margin-right:auto">${elementsOf(d).map(e => ATTR[e][0]).join(" / ")}</span>` + (d.xyz ? `<span class="rk-l">Rank ${d.rank}</span>` + Array.from({length:d.rank}, () => `<i class="rk"></i>`).join("") : Array.from({length:d.level}, () => "<i></i>").join(""));
     type = cardType(d);
-    ad = `<div class="ad"><span class="a">ATK ${d.atk}</span><span class="d">DEF ${d.def}</span><span class="l">LP ${monBaseLp({id})}</span></div>`;
+    ad = `<div class="ad"><span class="a">ATK ${d.atk}</span><span class="d">DEF ${d.def}</span><span class="l">LP ${d.bossForm ? ((Object.values(BOSSES).find(B => B.form === id) || {}).lp || monBaseLp({id})) : monBaseLp({id})}</span></div>`;
   } else if (d.kind === "hero"){
     lv = `<span style="margin-right:auto">Duelist</span>`;
     type = cardType(d);
@@ -7045,6 +7067,7 @@ function closeSheet(){ ui.sheet = null; renderSheet(); }
 function renderSheet(){
   const host = $("#sheetHost");
   ui.actions = [];
+  if (!S || S.winner == null) ui.endHoldSince = 0;
   let html = "", dismissable = true;
   const btn = (label, fn, cls = "", attrs = "") => { ui.actions.push(fn); return `<button type="button" class="btn ${cls}" data-act="${ui.actions.length - 1}" ${attrs}>${esc(label)}</button>`; };
   const inGame = ui.view === "game" && S;
@@ -7057,6 +7080,9 @@ function renderSheet(){
       acts:btn("Watch", () => { ui.outSeen = true; Sound.setTrack("duel"); closeSheet(); }) + btn("Menu", () => { if (ui.match === "online") leaveOnline(); else showView("menu"); }, "ghost")};
     dismissable = false;
   } else if (inGame && S.winner != null && !overlayAllowed && !(sh && sh.type === "card")){
+    // the winning blow plays out first (lunge, hits, Life Points counting down); then the end screen comes up
+    const now = typeof performance !== "undefined" ? performance.now() : 0, wait = ui.busy ? 300 : (ui.fxUntil || 0) - now;
+    if (wait > 0 && now - (ui.endHoldSince || (ui.endHoldSince = now)) < 6000){ host.innerHTML = ""; clearTimeout(ui.endT); ui.endT = setTimeout(renderSheet, Math.min(wait, 1500) + 120); return; }
     const won = S.winner >= 0 && sameTeam(S, S.winner, ME);
     let acts = "";
     if (ui.match === "bot") acts = btn(S.hunt ? "Hunt again" : "New duel", () => S.hunt ? (S.coop ? newCoop(S.hunt) : newHunt(S.hunt)) : S.tag ? newTagDuel() : newBotDuel(S.players.length)) + btn("Menu", () => showView("menu"), "ghost");
@@ -9567,7 +9593,7 @@ function setupPWA(){
 /* ---- app builds: hardware back button, invite links that open the app, pause in the background ---- */
 function appBack(){
   if (ui.mode){ ui.mode = null; render(); return true; }
-  if (ui.sheet){ if (!(S && S.pending && S.pending.player === ME && ui.view === "game")) closeSheet(); return true; }
+  if (ui.sheet){ closeSheet(); return true; }   // a sheet the player opened (a card, a pile, the log) closes; a prompt lives in the controls
   if (ui.view !== "menu"){ goMenu(); return true; }
   return false;
 }

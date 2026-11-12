@@ -109,6 +109,24 @@ Gatefall is a pixel-art card battler with:
 - Install/help controls, offline shell caching, and update-safe no-cache handling for HTML, manifest, and worker.
 - `/api/*` traffic is explicitly excluded from service-worker interception.
 
+## v51 changes (2026-11-12): full checkup
+
+Rules (`tests/gatefall-v51-rules.cjs`):
+- Co-op hunts: the boss keeps its 3 powers (`newGame` made the 7-slot boss row after `setupBoss`, wiping them).
+- `bossStandby` now runs in the boss's Standby Phase (`beginStandby`): Regenerating Ooze / Molten Heart heal, destroyed powers return after 3 rounds. Mitosis and Brood Chamber use `tokenId` instead of `token`, so `sweepTokens` no longer deletes them.
+- Battle protection questions (Warden paying 1000, Graveseed, a Warden on the field destroying itself instead: new prompt `wardenSaveBattle`) are all asked before the battle in `prepareBattleWardens`, one monster at a time; `battleAskable` skips tokens and monsters saved anyway (`autoSaved`: invincible, endure, Bulwark Aegis). Inside the battle (`S.inBattle`, `resolveBattleNow`) `destroyMonster` never opens a prompt; no answer means "no".
+- Mercy Colossus heals instead of damaging monsters too, and when attacked (`merciful` in `resolveBattleNow`).
+- A Defense Position attacker that loses its ability in the chain (Skill Drain) stops its attack.
+- Velvet Nyx steals only from opponents; Show Off's petrified monsters can't block; the bot weighs Veilmoth Sprite by the damage that would really reach its LP; phased-out monsters come back with the LP they left with (`S.exiled[].lp`).
+- Texts: Fireball, Skyfire Judgment, Rampart Ram (direct attack deals its DEF), rules sheet "Attacking".
+
+Screen (`tests/gatefall-v51-ui.cjs`):
+- Attack mode: chosen attacker (gold glow) and targets (blinking red, static with reduced motion) are outlined in `::after` above the card.
+- Bigger board on big screens: `--appmax` (980px in a duel), `--zmax` 112px, `--zmaxc` 84px. Landscape screens at least 1000px wide (Fold inner held sideways, tablets, desktops) use the side-by-side layout (`--appmax: 100vw - 380px`). The side column keeps 44px clear for the phase column.
+- Co-op / 2v2 width formula counts the two small side piles (`/ 10.12`), so cards are ~25% bigger on narrow phones; the hand uses spare height there. Cards under 38px (`body[data-tiny]`) show their LP as a bar only. Badges scale with the card (`--bf`); the ×2 badge stays inside its zone above the LP badge.
+- Captured! overlay scrolls and shrinks its card on short screens; safe-area top/bottom padding outside duels; boss sprite (`.bwrap` z-index 2) sits under neighbouring cards; `#fx` goes under an open sheet; the end screen waits for the final blow (`ui.endHoldSince`); hunt tiles no longer stretch; Log/Rules buttons stick to the sheet bottom; boss cards show the boss's LP; Duelist chips in one row (pictures only under 520px); Android back closes any open sheet.
+- Still open: privacy policy placeholders (name, contact address, release date, hosting provider).
+
 ## v50 changes (2026-11-04): Double Damage
 
 - **Double Damage** is a monster property like Flight: from the card (`doubleDmg:true`, negated by Skill Drain) or given by an effect (`z.doubleDmg`, not negated, lost when the monster leaves the field); `hasDouble(S, z)`. When the monster attacks on its own, the battle damage it inflicts is doubled (`dbl`/`twice()` in `resolveBattle`): the gap it deals to a monster's LP (Attack or Defense target, blockers, a boss's LP) and damage to the player (direct attacks, carry-over; also Rampart Ram's throw-back if it ever has the property). Not doubled: team attacks, damage it takes when it loses, recoil from a higher DEF. `battleDestructionTargets` and the bots count the doubled damage. A ×2 badge (`.dblb`) shows on its zone; the card sheet says DOUBLE DAMAGE; rules sheet explains Flight and Double Damage together.
